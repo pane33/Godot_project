@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dl8i6wwg3d20q"]
+
+[ext_resource type="PackedScene" uid="uid://cc7bfawg1umd0" path="res://scenes/piece.tscn" id="1_2o275"]
+[ext_resource type="Texture2D" uid="uid://sinnbe6i4cyg" path="res://art/pieces/Orange Piece.png" id="2_376l6"]
+
+[node name="orange_piece" instance=ExtResource("1_2o275")]
+color = "orange"
+
+[node name="Sprite2D" parent="." index="0"]
+texture = ExtResource("2_376l6")

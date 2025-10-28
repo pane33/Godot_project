@@ -1,0 +1,5 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dgftfcba6nqrw"]
+
+[resource]
+depth_draw_mode = 1
+roughness = 0.46

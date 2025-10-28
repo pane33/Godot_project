@@ -1,0 +1,45 @@
+[gd_scene load_steps=2 format=3 uid="uid://dlrxy1rgwkaj8"]
+
+[ext_resource type="Texture2D" uid="uid://mykhhqopdfuo" path="res://sprites/Player.png" id="1_o5qli"]
+
+[node name="main" type="Node2D"]
+
+[node name="player" type="Sprite2D" parent="."]
+position = Vector2(153, 149)
+texture = ExtResource("1_o5qli")
+
+[node name="player4" type="Sprite2D" parent="."]
+position = Vector2(169, 35)
+rotation = -0.785398
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("1_o5qli")
+
+[node name="player5" type="Sprite2D" parent="."]
+position = Vector2(182, 285)
+rotation = 3.92699
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("1_o5qli")
+
+[node name="player6" type="Sprite2D" parent="."]
+position = Vector2(338, 279)
+rotation = 2.53073
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("1_o5qli")
+
+[node name="player7" type="Sprite2D" parent="."]
+position = Vector2(354, 35)
+rotation = 0.785398
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("1_o5qli")
+
+[node name="player3" type="Sprite2D" parent="."]
+position = Vector2(260, 149)
+scale = Vector2(2, 2)
+texture = ExtResource("1_o5qli")
+
+[node name="player2" type="Sprite2D" parent="."]
+position = Vector2(369, 149)
+texture = ExtResource("1_o5qli")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(265, 146)

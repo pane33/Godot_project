@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://ocxa4fny46bk"]
+
+[ext_resource type="Script" uid="uid://b1axvbkc5wat3" path="res://scipts/day_and_nightClock.gd" id="1_p4aay"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_fkfyu"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_p4aay"]
+
+[node name="lights" type="Node3D"]
+
+[node name="floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(16035.2, 0, 0, 0, -0.100183, 0, 0, 0, 13014.3, 0, 0, 0)
+mesh = SubResource("BoxMesh_fkfyu")
+
+[node name="sphere" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74616, 0)
+mesh = SubResource("SphereMesh_p4aay")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.959314, 0.282341, 0, -0.282341, -0.959314, 9.83276, 0.0408597, -10.5738)
+light_color = Color(0.998224, 0.932762, 0.85012, 1)
+light_energy = 1.238
+shadow_enabled = true
+script = ExtResource("1_p4aay")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.07888, 0.678892, -1.47242)
+visible = false
+light_color = Color(0.121582, 0.823392, 1.54018e-06, 1)
+light_energy = 4.802
+shadow_enabled = true
+omni_range = 3.34572
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(0.988502, -0.0522667, 0.141889, 0, 0.93836, 0.345659, -0.151209, -0.341684, 0.927571, 0, 1.74377, 4.79913)
+visible = false
+light_color = Color(0.0823529, 1, 1, 1)
+light_energy = 8.841
+shadow_enabled = true
+spot_range = 9.43943
+spot_angle = 26.8504
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.906249, -0.422745, 0, 0.422745, 0.906249, 0, 2.66367, -0.033886)

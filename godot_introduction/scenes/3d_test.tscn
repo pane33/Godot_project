@@ -1,0 +1,74 @@
+[gd_scene load_steps=10 format=3 uid="uid://dv4lud184nsqr"]
+
+[ext_resource type="Material" uid="uid://bd22tvy2prxtr" path="res://materials/metallic_green.tres" id="1_js724"]
+[ext_resource type="Material" uid="uid://dgftfcba6nqrw" path="res://materials/my_first_material.tres" id="2_egoj0"]
+[ext_resource type="Material" uid="uid://cqprctj772tnj" path="res://materials/basic_pink.tres" id="3_v6qjf"]
+[ext_resource type="Material" uid="uid://vefjj5052j1o" path="res://materials/transparent_red.tres" id="4_7e1rl"]
+[ext_resource type="Material" uid="uid://dxvp00i0ghfsw" path="res://materials/textured.tres" id="5_wgsck"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_linea"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_g22v7"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_mac0m"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_a1t6o"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="snowman" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0180354, 0.31059, 0.0755842)
+
+[node name="foot" type="MeshInstance3D" parent="snowman"]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0.886651, 0)
+material_override = ExtResource("1_js724")
+mesh = SubResource("SphereMesh_linea")
+skeleton = NodePath("../..")
+surface_material_override/0 = ExtResource("2_egoj0")
+
+[node name="body" type="MeshInstance3D" parent="snowman"]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 1.78264, 0)
+material_override = ExtResource("1_js724")
+mesh = SubResource("SphereMesh_g22v7")
+skeleton = NodePath("../..")
+
+[node name="head" type="MeshInstance3D" parent="snowman"]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, 2.58245, 0)
+material_override = ExtResource("1_js724")
+mesh = SubResource("SphereMesh_g22v7")
+skeleton = NodePath("../..")
+
+[node name="arms" type="MeshInstance3D" parent="snowman"]
+transform = Transform3D(1.74636, 0, 0, 0, 0.125441, 0, 0, 0, 0.159145, 0.00972024, 2.05155, 0)
+material_override = ExtResource("1_js724")
+mesh = SubResource("BoxMesh_mac0m")
+skeleton = NodePath("")
+
+[node name="basic_pink_sph" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.68261, 1.33807, 5.33472)
+material_override = ExtResource("3_v6qjf")
+mesh = SubResource("SphereMesh_a1t6o")
+
+[node name="metallic_green_sph" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.437032, 1.33807, 5.33472)
+material_override = ExtResource("1_js724")
+mesh = SubResource("SphereMesh_a1t6o")
+
+[node name="transparent_red_sph" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.809429, 1.33807, 5.33472)
+material_override = ExtResource("4_7e1rl")
+mesh = SubResource("SphereMesh_a1t6o")
+
+[node name="texured_sph" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.16652, 1.33807, 5.33472)
+material_override = ExtResource("5_wgsck")
+mesh = SubResource("SphereMesh_a1t6o")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.998757, -3.89484e-09, 0.0498433, 0.0278121, 0.829847, 0.557298, -0.0413623, 0.557991, -0.828815, 0.28527, 3.65349, -1.78402)
+fov = 68.2
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.804604, 0.593812, 0, -0.593812, -0.804604, 0, 6.64928, 1.90946)
+light_energy = 2.188
+shadow_enabled = true
