@@ -7,8 +7,9 @@ extends Node2D
 @export var y_start: int
 @export var offset: int
 
-var all_pieces = []
+# 
 
+# pieces array
 var possible_pieces = [
 	preload("res://scenes/blue_piece.tscn"),
 	preload("res://scenes/green_piece.tscn"),
@@ -17,6 +18,14 @@ var possible_pieces = [
 	preload("res://scenes/pink_piece.tscn"),
 	preload("res://scenes/yellow_piece.tscn"),
 ]
+
+# current piece in the scene
+var all_pieces = []
+
+#touch var
+var first_touch = Vector2(0,0)
+var final_touch = Vector2(0,0)
+var controlling = false
 
 # main func: it start only 1 time
 func _ready():
@@ -33,7 +42,6 @@ func make_2d_array():
 		for j in height:
 			array[i].append(null)
 	return array
-
 
 # spown the pieces randomly on the grid node
 func _spown_pices():
@@ -67,8 +75,78 @@ func _match_at(i, j, color):
 				return true
 	pass;
 
-# transform position any grid position in pixel position
+# transform position: any grid position in pixel position
 func _grid_to_pixel(column, row):
 	var new_x = x_start + offset * column
 	var new_y = y_start - offset * row
 	return Vector2(new_x, new_y)
+
+# verify if is the space of the grid
+func _is_in_grid(column, row):
+	if column >= 0 && column < width:
+		if row >= 0 && row < height:
+			return true
+	return false
+
+# transform position: any pixel position in grid position
+func _pixel_to_grid(pixel_x, pixel_y):
+	var new_x = round((pixel_x - x_start) / offset);
+	var new_y = round((pixel_y - y_start) / -offset);
+	return Vector2(new_x, new_y)
+
+# 
+func _touch_input():
+	if(Input.is_action_just_pressed("ui_touch")):
+		first_touch = get_global_mouse_position()
+		var grid_position = _pixel_to_grid(first_touch.x, first_touch.y)
+		if _is_in_grid(grid_position.x, grid_position.y):
+			controlling = true
+
+	if Input.is_action_just_released("ui_touch"):
+		final_touch = get_global_mouse_position()
+		# Calcola la posizione finale della griglia
+		var final_grid_position = _pixel_to_grid(final_touch.x, final_touch.y)
+		
+		# Calcola la posizione iniziale della griglia
+		var first_grid_position = _pixel_to_grid(first_touch.x, first_touch.y)
+		
+		if _is_in_grid(final_grid_position.x, final_grid_position.y) && controlling:
+			# Passa le due posizioni corrette
+			touch_difference(first_grid_position, final_grid_position)
+			controlling = false
+
+func swap_pieces(column: int, row: int, direction: Vector2):
+	var first_piece = all_pieces[column][row]
+	var other_piece = all_pieces[column + direction.x][row + direction.y]
+	
+	all_pieces[column][row] = other_piece
+	all_pieces[column + direction.x][row + direction.y] = first_piece
+	
+	first_piece.move(_grid_to_pixel(column + direction.x, row + direction.y))
+	other_piece.move(_grid_to_pixel(column, row))
+	
+
+func touch_difference(pos_grid_1, pos_grid_2):
+	var difference = pos_grid_2 - pos_grid_1
+	
+	# Swap orizzontale
+	if abs(difference.x) > abs(difference.y):
+		if difference.x > 0:
+			# Muovi a destra
+			swap_pieces(pos_grid_1.x, pos_grid_1.y, Vector2(1,0))
+		elif difference.x < 0:
+			# Muovi a sinistra
+			swap_pieces(pos_grid_1.x, pos_grid_1.y, Vector2(-1,0))
+	
+	# Swap verticale
+	elif abs(difference.y) > abs(difference.x):
+		if difference.y > 0:
+			# Muovi in alto 
+			swap_pieces(pos_grid_1.x, pos_grid_1.y, Vector2(0,1))
+		elif difference.y < 0:
+			# Muovi in basso 
+			swap_pieces(pos_grid_1.x, pos_grid_1.y, Vector2(0,-1))
+
+func _process(delta):
+	_touch_input()
+	pass;
