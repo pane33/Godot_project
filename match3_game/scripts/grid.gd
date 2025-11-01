@@ -41,10 +41,31 @@ func _spown_pices():
 		for j in height:
 			# chose a random number and store it
 			var rand = floor(randf_range(0, possible_pieces.size()))
+			
 			var scene: PackedScene = possible_pieces[rand]
 			var piece = scene.instantiate()
+			
+			var loops = 0
+			while(_match_at(i, j, piece.color) && loops < 100):
+				rand = floor(randf_range(0, possible_pieces.size()))
+				loops += 1
+				piece = possible_pieces[rand].instantiate()
+			# instance that piece from the array
 			add_child(piece)
 			piece.position = _grid_to_pixel(i, j)
+			all_pieces[i][j] = piece;
+
+func _match_at(i, j, color):
+	if i > 1:
+		if all_pieces[i -1][j] != null && all_pieces[i - 2][j] != null:
+			if all_pieces[i - 1][j].color == color && all_pieces[i - 2][j].color == color:
+				return true
+
+	if j > 1:
+		if all_pieces[i][j - 1] != null && all_pieces[i][j - 2] != null:
+			if all_pieces[i][j - 1].color == color && all_pieces[i][j - 2].color == color:
+				return true
+	pass;
 
 # transform position any grid position in pixel position
 func _grid_to_pixel(column, row):
