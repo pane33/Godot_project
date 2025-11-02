@@ -3,6 +3,8 @@ extends Node2D
 @export var color: String
 
 var move_tween;
+var match = false
+
 
 func _ready():
 	
@@ -19,3 +21,8 @@ func move(target):
 
 	# 3. Non serve .start()! Il tween parte da solo.
 	pass;
+
+func dim():
+	var sprite = get_node("Sprite2D")
+	sprite.modulate = Color(1, 1, 1, .5)
+	pass

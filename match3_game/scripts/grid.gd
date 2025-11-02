@@ -73,7 +73,6 @@ func _match_at(i, j, color):
 		if all_pieces[i][j - 1] != null && all_pieces[i][j - 2] != null:
 			if all_pieces[i][j - 1].color == color && all_pieces[i][j - 2].color == color:
 				return true
-	pass;
 
 # transform position: any grid position in pixel position
 func _grid_to_pixel(column, row):
@@ -124,7 +123,7 @@ func swap_pieces(column: int, row: int, direction: Vector2):
 	
 	first_piece.move(_grid_to_pixel(column + direction.x, row + direction.y))
 	other_piece.move(_grid_to_pixel(column, row))
-	
+	find_matches()
 
 func touch_difference(pos_grid_1, pos_grid_2):
 	var difference = pos_grid_2 - pos_grid_1
@@ -147,6 +146,34 @@ func touch_difference(pos_grid_1, pos_grid_2):
 			# Muovi in basso 
 			swap_pieces(pos_grid_1.x, pos_grid_1.y, Vector2(0,-1))
 
+@warning_ignore("unused_parameter")
 func _process(delta):
 	_touch_input()
 	pass;
+
+func find_matches():
+	for i in width:
+		for j in height:
+			if all_pieces[i][j] != null:
+				var current_color = all_pieces[i][j].color
+				# check left and right
+				if i > 0 && i < width - 1:
+					if all_pieces[i - 1][j] != null && all_pieces[i + 1][j] != null:
+						if all_pieces[i - 1][j].color == current_color && all_pieces[i + 1][j].color == current_color:
+							all_pieces[i - 1][j].match = true
+							all_pieces[i - 1][j].dim()
+							all_pieces[i][j].match = true
+							all_pieces[i][j].dim()
+							all_pieces[i + 1][j].match = true
+							all_pieces[i + 1][j].dim()
+				# check up and down
+				if j > 0 && j < height - 1:
+					if all_pieces[i][j - 1] != null && all_pieces[i][j + 1] != null:
+						if all_pieces[i][j - 1].color == current_color && all_pieces[i][j + 1].color == current_color:
+							all_pieces[i][j - 1].match = true
+							all_pieces[i][j - 1].dim()
+							all_pieces[i][j].match = true
+							all_pieces[i][j].dim()
+							all_pieces[i][j + 1].match = true
+							all_pieces[i][j + 1].dim()
+				
