@@ -95,26 +95,30 @@ func _pixel_to_grid(pixel_x, pixel_y):
 
 # 
 func _touch_input():
-	if(Input.is_action_just_pressed("ui_touch")):
+	if Input.is_action_just_pressed("ui_touch"):
 		first_touch = get_global_mouse_position()
 		var grid_position = _pixel_to_grid(first_touch.x, first_touch.y)
+		
+		# verifica che il click iniziale sia valido
 		if _is_in_grid(grid_position.x, grid_position.y):
-			controlling = true
-
-	if Input.is_action_just_released("ui_touch"):
-		final_touch = get_global_mouse_position()
-		# Calcola la posizione finale della griglia
-		var final_grid_position = _pixel_to_grid(final_touch.x, final_touch.y)
-		
-		# Calcola la posizione iniziale della griglia
-		var first_grid_position = _pixel_to_grid(first_touch.x, first_touch.y)
-		
-		if _is_in_grid(final_grid_position.x, final_grid_position.y) && controlling:
-			# Passa le due posizioni corrette
-			touch_difference(first_grid_position, final_grid_position)
+			controlling = true # first_position is good we can go to the final_position
+		else:
 			controlling = false
+			return  # ignora l'input fuori griglia
+
+	if Input.is_action_just_released("ui_touch") and controlling:
+		final_touch = get_global_mouse_position()
+		var final_grid_position = _pixel_to_grid(final_touch.x, final_touch.y)
+		var first_grid_position = _pixel_to_grid(first_touch.x, first_touch.y) # has to be redeclared
+
+		# verifica che anche il rilascio sia valido
+		if _is_in_grid(final_grid_position.x, final_grid_position.y):
+			touch_difference(first_grid_position, final_grid_position)
+
+		controlling = false # reinizialized for other touch
 
 func swap_pieces(column: int, row: int, direction: Vector2):
+	
 	var first_piece = all_pieces[column][row]
 	var other_piece = all_pieces[column + direction.x][row + direction.y]
 	
@@ -151,29 +155,29 @@ func _process(delta):
 	_touch_input()
 	pass;
 
+func _check_match_line(i, j, color, dir: Vector2):
+	var i1 = i - int(dir.x)
+	var j1 = j - int(dir.y)
+	var i2 = i + int(dir.x)
+	var j2 = j + int(dir.y)
+	
+	if not _is_in_grid(i1, j1) or not _is_in_grid(i2, j2):
+		return
+	var a = all_pieces[i1][j1]
+	var b = all_pieces[i2][j2]
+	if a == null or b == null:
+		return
+	if a.color == color and b.color == color:
+		for p in [a, all_pieces[i][j], b]:
+			p.match = true
+			p.dim()
+
 func find_matches():
 	for i in width:
 		for j in height:
-			if all_pieces[i][j] != null:
-				var current_color = all_pieces[i][j].color
-				# check left and right
-				if i > 0 && i < width - 1:
-					if all_pieces[i - 1][j] != null && all_pieces[i + 1][j] != null:
-						if all_pieces[i - 1][j].color == current_color && all_pieces[i + 1][j].color == current_color:
-							all_pieces[i - 1][j].match = true
-							all_pieces[i - 1][j].dim()
-							all_pieces[i][j].match = true
-							all_pieces[i][j].dim()
-							all_pieces[i + 1][j].match = true
-							all_pieces[i + 1][j].dim()
-				# check up and down
-				if j > 0 && j < height - 1:
-					if all_pieces[i][j - 1] != null && all_pieces[i][j + 1] != null:
-						if all_pieces[i][j - 1].color == current_color && all_pieces[i][j + 1].color == current_color:
-							all_pieces[i][j - 1].match = true
-							all_pieces[i][j - 1].dim()
-							all_pieces[i][j].match = true
-							all_pieces[i][j].dim()
-							all_pieces[i][j + 1].match = true
-							all_pieces[i][j + 1].dim()
-				
+			var piece = all_pieces[i][j]
+			if piece == null:
+				continue
+			var color = piece.color
+			_check_match_line(i, j, color, Vector2(1, 0))  # orizzontale
+			_check_match_line(i, j, color, Vector2(0, 1))  # verticale
