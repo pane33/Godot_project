@@ -7,6 +7,11 @@
 
 [node name="Node2D" type="Node2D"]
 
+[node name="Window" type="Window" parent="."]
+oversampling_override = 1.0
+size = Vector2i(1728, 832)
+visible = false
+
 [node name="top_ui" type="TextureRect" parent="."]
 offset_left = 1070.0
 offset_top = 22.0
@@ -30,10 +35,6 @@ offset_bottom = 852.0
 scale = Vector2(1, 0.7)
 texture = ExtResource("3_tbgi4")
 
-[node name="Window" type="Window" parent="."]
-size = Vector2i(1728, 832)
-visible = false
-
 [node name="grid" type="Node2D" parent="."]
 script = ExtResource("4_jyhfs")
 width = 10
@@ -41,3 +42,14 @@ height = 9
 x_start = 1002
 y_start = 723
 offset = 64
+
+[node name="destroy_timer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="collapse_timer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[connection signal="timeout" from="destroy_timer" to="grid" method="_on_destroy_timer_timeout"]
+[connection signal="timeout" from="collapse_timer" to="grid" method="_on_collapse_timer_timeout"]
