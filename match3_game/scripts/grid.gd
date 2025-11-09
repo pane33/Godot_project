@@ -120,16 +120,42 @@ func _touch_input():
 
 # Scambia due pezzi di posizione in base alla direzione passata
 func swap_pieces(column: int, row: int, direction: Vector2):
-	var first_piece = all_pieces[column][row]
-	var other_piece = all_pieces[column + direction.x][row + direction.y]
+	var first_piece = all_pieces[column][row]                       # pezzo di partenza
+	var other_piece = all_pieces[column + direction.x][row + direction.y]  # pezzo adiacente nella direzione scelta
 	
-	if first_piece != null && other_piece != null:
+	if first_piece != null && other_piece != null:                   # verifica che entrambi i pezzi esistano
+		# Scambia logicamente i pezzi nella matrice
 		all_pieces[column][row] = other_piece
 		all_pieces[column + direction.x][row + direction.y] = first_piece
 		
+		# Anima il movimento visivo dei pezzi scambiati
 		first_piece.move(_grid_to_pixel(column + direction.x, row + direction.y))
 		other_piece.move(_grid_to_pixel(column, row))
+		
+		# Controlla se lo scambio genera almeno un match valido
 		find_matches()
+		
+		# Flag per verificare se è stato trovato un match
+		var match_found = false
+		for i in width:
+			for j in height:
+				var p = all_pieces[i][j]
+				if p != null and p.match:       # se un pezzo è marcato come match
+					match_found = true          # c'è almeno una combinazione valida
+					break
+			if match_found:
+				break
+
+		# Se non è stato trovato alcun match, annulla lo scambio
+		if not match_found:
+			# Ripristina la logica della matrice
+			all_pieces[column][row] = first_piece
+			all_pieces[column + direction.x][row + direction.y] = other_piece
+
+			# Riporta graficamente i pezzi alle posizioni originali
+			first_piece.move(_grid_to_pixel(column, row))
+			other_piece.move(_grid_to_pixel(column + direction.x, row + direction.y))
+
 
 # Calcola la direzione del movimento e richiama lo swap appropriato
 func touch_difference(pos_grid_1, pos_grid_2):
