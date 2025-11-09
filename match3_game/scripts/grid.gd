@@ -25,8 +25,13 @@ var first_touch = Vector2(0,0)   # posizione iniziale del tocco
 var final_touch = Vector2(0,0)   # posizione finale del tocco
 var controlling = false          # indica se un tocco valido è in corso
 
+# state machine
+enum {move, wait}
+var state;
+
 # Funzione principale chiamata una sola volta all'avvio
 func _ready():
+	state = move
 	randomize()                   # randomizza il generatore di numeri casuali
 	all_pieces = make_2d_array()  # inizializza la griglia
 	_spown_pices()                # genera i pezzi iniziali
@@ -63,28 +68,7 @@ func _spown_pices():
 			piece.position = _grid_to_pixel(i, j)
 			all_pieces[i][j] = piece;
 
-# Rigenera i pezzi mancanti sulla griglia (quelli che sono null)
-func respown_pieces():
-	for i in width:
-		for j in height:
-			if all_pieces[i][j] == null:
-				# Sceglie un indice casuale del pezzo da generare
-				var rand = floor(randf_range(0, possible_pieces.size()))
-				var scene: PackedScene = possible_pieces[rand]
-				var piece = scene.instantiate()
-				
-				# Posizione iniziale: sopra la griglia
-				piece.position = _grid_to_pixel(i, 10)  # parte da riga 10 (fuori vista)
-				
-				# Istanzia il pezzo e lo aggiunge alla scena
-				add_child(piece)
-				all_pieces[i][j] = piece
-				
-				# Posizione finale sulla griglia
-				var target = _grid_to_pixel(i, j)
-				
-				# Anima la caduta verso la posizione finale
-				piece.move(target)
+
 
 # Controlla se ci sono già 2 pezzi uguali adiacenti (evita spawn immediati di match)
 func _match_at(i, j, color):
@@ -147,13 +131,18 @@ func swap_pieces(column: int, row: int, direction: Vector2):
 	var other_piece = all_pieces[column + direction.x][row + direction.y]  # pezzo adiacente nella direzione scelta
 	
 	if first_piece != null && other_piece != null:                   # verifica che entrambi i pezzi esistano
+		# cambia lo sato della "macchina" in wait
+		state = wait
 		# Scambia logicamente i pezzi nella matrice
 		all_pieces[column][row] = other_piece
 		all_pieces[column + direction.x][row + direction.y] = first_piece
 		
 		# Anima il movimento visivo dei pezzi scambiati
-		first_piece.move(_grid_to_pixel(column + direction.x, row + direction.y))
-		other_piece.move(_grid_to_pixel(column, row))
+		var tween1 = first_piece.move(_grid_to_pixel(column + direction.x, row + direction.y))
+		var tween2 = other_piece.move(_grid_to_pixel(column, row))
+		
+		await tween1.finished
+		await tween2.finished
 		
 		# Controlla se lo scambio genera almeno un match valido
 		find_matches()
@@ -176,8 +165,13 @@ func swap_pieces(column: int, row: int, direction: Vector2):
 			all_pieces[column + direction.x][row + direction.y] = other_piece
 
 			# Riporta graficamente i pezzi alle posizioni originali
-			first_piece.move(_grid_to_pixel(column, row))
-			other_piece.move(_grid_to_pixel(column + direction.x, row + direction.y))
+			var revert_tween1 = first_piece.move(_grid_to_pixel(column, row))
+			var revert_tween2 = other_piece.move(_grid_to_pixel(column + direction.x, row + direction.y))
+			
+			await revert_tween1.finished
+			await revert_tween2.finished
+	# cambia lo sato della "macchina" in move
+	state = move
 
 
 # Calcola la direzione del movimento e richiama lo swap appropriato
@@ -205,7 +199,8 @@ func touch_difference(pos_grid_1, pos_grid_2):
 # Funzione chiamata ogni frame
 @warning_ignore("unused_parameter")
 func _process(delta):
-	_touch_input()
+	if state == move:
+		_touch_input()
 	pass;
 
 # Controlla se ci sono tre pezzi uguali allineati in una direzione
@@ -259,12 +254,46 @@ func collapse_columns():
 						all_pieces[i][j] = all_pieces[i][k]
 						all_pieces[i][k] = null
 						break
+	get_parent().get_node("respown_timer").start()
+
+# Rigenera i pezzi mancanti sulla griglia (quelli che sono null)
+func respown_pieces():
+	for i in width:
+		for j in height:
+			if all_pieces[i][j] == null:
+				# Sceglie un indice casuale del pezzo da generare
+				var rand = floor(randf_range(0, possible_pieces.size()))
+				var scene: PackedScene = possible_pieces[rand]
+				var piece = scene.instantiate()
+				
+				# Evita di creare subito combinazioni di 3 uguali
+				var loops = 0
+				while(_match_at(i, j, piece.color) && loops < 100):
+					rand = floor(randf_range(0, possible_pieces.size()))
+					loops += 1
+					piece = possible_pieces[rand].instantiate()
+				
+				# Posizione iniziale: sopra la griglia
+				piece.position = _grid_to_pixel(i, 10)  # parte da riga 10 (fuori vista)
+				
+				# Istanzia il pezzo e lo aggiunge alla scena
+				add_child(piece)
+				all_pieces[i][j] = piece
+				
+				# Posizione finale sulla griglia
+				var target = _grid_to_pixel(i, j)
+				
+				# Anima la caduta verso la posizione finale
+				piece.move(target)
+	after_respown()
+
+func after_respown():
+	find_matches()
+	pass
 
 # Chiamata dal timer per eliminare i pezzi dopo un match
 func _on_destroy_timer_timeout():
 	destroy_matched()
-	find_matches()
-	get_parent().get_node("respown_timer").start()
 
 # Chiamata del timer per attivare il collasso delle colonne dopo una distruzione
 func _on_collapse_timer_timeout() -> void:
@@ -273,4 +302,3 @@ func _on_collapse_timer_timeout() -> void:
 # Funzione chiamata dal timer per eseguire respawn dei pezzi mancanti
 func _on_respown_timer_timeout() -> void:
 	respown_pieces()
-	pass

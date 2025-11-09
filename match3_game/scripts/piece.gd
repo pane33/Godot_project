@@ -11,16 +11,16 @@ func _ready():
 	pass;
 
 # Muove il pezzo verso una posizione target con animazione Tween
-func move(target):
+func move(target) -> Tween:
 	# Crea un nuovo tween
 	var tween = create_tween()
 
 	# Anima la proprietà "position" verso il target in 0.5s con effetto elastico
-	tween.tween_property(self, "position", target, 0.5) \
+	tween.tween_property(self, "position", target, 0.3) \
 		 .set_trans(Tween.TRANS_ELASTIC) \
 		 .set_ease(Tween.EASE_OUT)
-
-	pass;
+	
+	return tween
 
 # Rende il pezzo semi-trasparente quando è parte di un match
 func dim():
