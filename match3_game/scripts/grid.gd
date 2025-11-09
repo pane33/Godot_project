@@ -170,8 +170,6 @@ func swap_pieces(column: int, row: int, direction: Vector2):
 			
 			await revert_tween1.finished
 			await revert_tween2.finished
-	# cambia lo sato della "macchina" in move
-	state = move
 
 
 # Calcola la direzione del movimento e richiama lo swap appropriato
@@ -289,6 +287,8 @@ func respown_pieces():
 
 func after_respown():
 	find_matches()
+	# cambia lo sato della "macchina" in move
+	state = move
 	pass
 
 # Chiamata dal timer per eliminare i pezzi dopo un match

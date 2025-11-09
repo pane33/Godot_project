@@ -44,7 +44,7 @@ y_start = 723
 offset = 64
 
 [node name="destroy_timer" type="Timer" parent="."]
-wait_time = 0.2
+wait_time = 0.1
 one_shot = true
 
 [node name="collapse_timer" type="Timer" parent="."]
