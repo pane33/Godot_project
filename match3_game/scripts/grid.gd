@@ -74,7 +74,7 @@ func respown_pieces():
 				var piece = scene.instantiate()
 				
 				# Posizione iniziale: sopra la griglia
-				piece.position = _grid_to_pixel(i, 1)  # parte da riga -1 (fuori vista)
+				piece.position = _grid_to_pixel(i, 10)  # parte da riga 10 (fuori vista)
 				
 				# Istanzia il pezzo e lo aggiunge alla scena
 				add_child(piece)
