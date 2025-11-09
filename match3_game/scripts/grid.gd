@@ -63,6 +63,29 @@ func _spown_pices():
 			piece.position = _grid_to_pixel(i, j)
 			all_pieces[i][j] = piece;
 
+# Rigenera i pezzi mancanti sulla griglia (quelli che sono null)
+func respown_pieces():
+	for i in width:
+		for j in height:
+			if all_pieces[i][j] == null:
+				# Sceglie un indice casuale del pezzo da generare
+				var rand = floor(randf_range(0, possible_pieces.size()))
+				var scene: PackedScene = possible_pieces[rand]
+				var piece = scene.instantiate()
+				
+				# Posizione iniziale: sopra la griglia
+				piece.position = _grid_to_pixel(i, 1)  # parte da riga -1 (fuori vista)
+				
+				# Istanzia il pezzo e lo aggiunge alla scena
+				add_child(piece)
+				all_pieces[i][j] = piece
+				
+				# Posizione finale sulla griglia
+				var target = _grid_to_pixel(i, j)
+				
+				# Anima la caduta verso la posizione finale
+				piece.move(target)
+
 # Controlla se ci sono già 2 pezzi uguali adiacenti (evita spawn immediati di match)
 func _match_at(i, j, color):
 	if i > 1:
@@ -240,7 +263,14 @@ func collapse_columns():
 # Chiamata dal timer per eliminare i pezzi dopo un match
 func _on_destroy_timer_timeout():
 	destroy_matched()
+	find_matches()
+	get_parent().get_node("respown_timer").start()
 
 # Chiamata del timer per attivare il collasso delle colonne dopo una distruzione
 func _on_collapse_timer_timeout() -> void:
 	collapse_columns()
+
+# Funzione chiamata dal timer per eseguire respawn dei pezzi mancanti
+func _on_respown_timer_timeout() -> void:
+	respown_pieces()
+	pass
