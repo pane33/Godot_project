@@ -42,6 +42,7 @@ height = 9
 x_start = 1002
 y_start = 723
 offset = 64
+empty_space = PackedVector2Array(0, 0, 9, 0, 0, 8, 9, 8, 0, 9, 4, 3, 5, 3, 4, 4, 5, 4)
 
 [node name="destroy_timer" type="Timer" parent="."]
 wait_time = 0.1

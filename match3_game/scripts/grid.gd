@@ -7,6 +7,9 @@ extends Node2D
 @export var y_start: int      # posizione Y iniziale della griglia
 @export var offset: int       # distanza in pixel tra le celle
 
+# obtacle var
+@export var empty_space: PackedVector2Array
+
 # Array delle possibili scene di pezzi caricabili
 var possible_pieces = [
 	preload("res://scenes/blue_piece.tscn"),
@@ -36,6 +39,12 @@ func _ready():
 	all_pieces = make_2d_array()  # inizializza la griglia
 	_spown_pices()                # genera i pezzi iniziali
 
+func restricted_movement(place):
+	for i in empty_space.size():
+		if empty_space[i] == place:
+			return true
+	return false
+
 # Crea un array 2D riempito con valori null
 func make_2d_array():
 	var array = []
@@ -50,23 +59,24 @@ func make_2d_array():
 func _spown_pices():
 	for i in width:
 		for j in height:
-			# Sceglie un indice casuale del pezzo da generare
-			var rand = floor(randf_range(0, possible_pieces.size()))
-			
-			var scene: PackedScene = possible_pieces[rand]
-			var piece = scene.instantiate()
-			
-			# Evita di creare subito combinazioni di 3 uguali
-			var loops = 0
-			while(_match_at(i, j, piece.color) && loops < 100):
-				rand = floor(randf_range(0, possible_pieces.size()))
-				loops += 1
-				piece = possible_pieces[rand].instantiate()
-			
-			# Istanzia il pezzo e lo posiziona sulla griglia
-			add_child(piece)
-			piece.position = _grid_to_pixel(i, j)
-			all_pieces[i][j] = piece;
+			if !restricted_movement(Vector2(i, j)):
+				# Sceglie un indice casuale del pezzo da generare
+				var rand = floor(randf_range(0, possible_pieces.size()))
+				
+				var scene: PackedScene = possible_pieces[rand]
+				var piece = scene.instantiate()
+				
+				# Evita di creare subito combinazioni di 3 uguali
+				var loops = 0
+				while(_match_at(i, j, piece.color) && loops < 100):
+					rand = floor(randf_range(0, possible_pieces.size()))
+					loops += 1
+					piece = possible_pieces[rand].instantiate()
+				
+				# Istanzia il pezzo e lo posiziona sulla griglia
+				add_child(piece)
+				piece.position = _grid_to_pixel(i, j)
+				all_pieces[i][j] = piece;
 
 
 
@@ -245,7 +255,7 @@ func destroy_matched():
 func collapse_columns():
 	for i in width:
 		for j in height:
-			if all_pieces[i][j] == null:
+			if all_pieces[i][j] == null && !restricted_movement(Vector2(i,j)):
 				for k in range(j + 1, height):
 					if all_pieces[i][k] != null:
 						all_pieces[i][k].move(_grid_to_pixel(i, j))
@@ -258,7 +268,7 @@ func collapse_columns():
 func respown_pieces():
 	for i in width:
 		for j in height:
-			if all_pieces[i][j] == null:
+			if all_pieces[i][j] == null && !restricted_movement(Vector2(i, j)):
 				# Sceglie un indice casuale del pezzo da generare
 				var rand = floor(randf_range(0, possible_pieces.size()))
 				var scene: PackedScene = possible_pieces[rand]
